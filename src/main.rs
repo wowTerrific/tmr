@@ -4,8 +4,7 @@ use std::io::{stdout, Read, Write};
 mod parse;
 use parse::{decrement_time, get_time};
 
-// TODO - use DEFAULT when implementing clap
-// const DEFAULT: &str = "25:00";
+const DEFAULT: &str = "25:00";
 const INPUT_MESSAGE: &str = "Press enter for 25 minutes or enter a time in HH:MM:SS format. Enter [Q] to exit.";
 const TIMES_UP: &str = "
 ████████ ██ ███    ███ ███████ ███████     ██    ██ ██████  ██ 
@@ -31,6 +30,9 @@ fn main() {
 
         if &time.trim().to_lowercase() == "q" {
             return;
+        }
+        if &time == "\r\n" {
+            time = DEFAULT.to_string();
         }
     
         match get_time(time) {
