@@ -28,6 +28,20 @@ pub fn get_time(time: String) -> Result<(u8, u8, u8), Box<dyn error::Error>> {
   }
 }
 
+pub fn decrement_time(hr: &mut u8, min: &mut u8, sec: &mut u8) {
+  if *sec == 0 {
+    if *min == 0 {
+      *hr -= 1;
+      *min = 59;
+      *sec = 60;
+    } else {
+      *min -= 1;
+      *sec = 60;
+    }
+  }
+  *sec -= 1;
+}
+
 #[derive(Debug)]
 struct BadInputError;
 impl error::Error for BadInputError {}
@@ -77,6 +91,41 @@ mod tests {
       if let Ok(_) = get_time(test.to_string()) {
         panic!("{} should have thrown an error", test)
       }
+    }
+
+  }
+
+  #[derive(Debug)]
+  struct TestTimes {
+    input: (u8 , u8, u8),
+    expected: (u8, u8, u8),
+  }
+
+  #[test]
+  fn test_decrement_time() {
+    let mut tests = vec![
+      TestTimes{
+        input: (1, 0, 0),
+        expected: (0, 59, 59),
+      },
+      TestTimes{
+        input: (0, 1, 0),
+        expected: (0, 0, 59),
+      },
+      TestTimes{
+        input: (2, 3, 40),
+        expected: (2, 3, 39),
+      },
+    ];
+
+    for test in tests {
+      let mut input = test.input.clone();
+      decrement_time(&mut input.0, &mut input.1, &mut input.2);
+      if input.0 != test.expected.0 ||
+        input.1 != test.expected.1 ||
+        input.2 != test.expected.2 {
+          panic!("got {:?} wanted {:?}", input, test.expected)
+        }
     }
 
   }

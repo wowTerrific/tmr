@@ -2,19 +2,11 @@ use std::{io, thread, time};
 use std::io::{stdout, Read, Write};
 
 mod parse;
-use parse::get_time;
-// use crate::parse::*;
+use parse::{decrement_time, get_time};
 
-// User enters time as argument, defaults to 25:00 if no argument entered
-// User may enter HH:MM:SS or MM:SS
-// DONE - Parse HH:MM:SS to (u8, u8, u8)
-// DONE - parse MM:SS to (u8, u8)
-// Every second, SS is decremented
-    // if SS is 00, MM -1, SS = 59, etc.
-// once HH, MM, SS are all 00, create flashing "times up!" ascii art
-
-const DEFAULT: &str = "25:00";
-const INPUT_MESSAGE: &str = "Press enter for 25 minutes or enter a time in HH:MM:SS format. Press [Q] to exit.";
+// TODO - use DEFAULT when implementing clap
+// const DEFAULT: &str = "25:00";
+const INPUT_MESSAGE: &str = "Press enter for 25 minutes or enter a time in HH:MM:SS format. Enter [Q] to exit.";
 const TIMES_UP: &str = "
 ████████ ██ ███    ███ ███████ ███████     ██    ██ ██████  ██ 
    ██    ██ ████  ████ ██      ██          ██    ██ ██   ██ ██ 
@@ -24,9 +16,7 @@ const TIMES_UP: &str = "
 ";
 
 fn main() {
-    
     let mut stdout = stdout();
-    let mut counter = 0;
     
     println!("{}", INPUT_MESSAGE);
 
@@ -65,18 +55,7 @@ fn main() {
             break;
         }
 
-        if sec == 0 {
-            if min == 0 {
-                hr -= 1;
-                min = 59;
-                sec = 60;
-            } else {
-                min -= 1;
-                sec = 60;
-            }
-        }
-
-        sec -= 1;
+        decrement_time(&mut hr, &mut min, &mut sec);
 
         thread::sleep(time::Duration::from_secs(1));
     }
@@ -87,7 +66,7 @@ fn main() {
     loop {
         let mut input: Vec<u8> = Vec::new();
 
-        if let Err(e) = io::stdin().read(&mut input) {
+        if let Err(_) = io::stdin().read(&mut input) {
            continue;
         } else {
            return;
